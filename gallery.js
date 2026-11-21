@@ -136,7 +136,7 @@ new ResizeObserver(() => {
 const saved = await readLayout();
 if (editorToken) {
   const { initializeEditor } = await import('./editor/editor.js');
-  initializeEditor({ works, canvasWidth, canvasMetrics, completePositions, setPositions, saved, editorToken });
+  initializeEditor({ gallery, works, canvasWidth, canvasMetrics, completePositions, setPositions, saved, editorToken });
 } else if (works.some(({ id }) => isPosition(saved[id]))) {
   function applyDesktopLayout() {
     if (desktop.matches && !Object.keys(positions).length) positions = completePositions(saved);

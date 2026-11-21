@@ -31,7 +31,7 @@ function saveDraft(positions) {
   }
 }
 
-export function initializeEditor({ works, canvasWidth, canvasMetrics, completePositions, setPositions, saved, editorToken }) {
+export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, completePositions, setPositions, saved, editorToken }) {
   const toolbar = document.createElement('aside');
   toolbar.className = 'editor-toolbar';
   toolbar.setAttribute('aria-label', 'Редактор раскладки');
@@ -39,73 +39,127 @@ export function initializeEditor({ works, canvasWidth, canvasMetrics, completePo
   const jump = document.createElement('select');
   jump.setAttribute('aria-label', 'Перейти к работе');
   jump.add(new Option('Перейти к работе…', ''));
-  const moveHere = makeButton('', 'Перенести выбранную работу в видимую область', 'Перенести сюда');
+  const moveHere = makeButton('', 'Перенести выбранное в видимую область', 'Перенести сюда');
   const scaleControls = document.createElement('div');
   scaleControls.className = 'editor-scale';
   scaleControls.setAttribute('role', 'group');
-  scaleControls.setAttribute('aria-label', 'Размер выбранной работы');
-  const shrink = makeButton('', 'Уменьшить выбранную работу', '−');
-  const grow = makeButton('', 'Увеличить выбранную работу', '+');
+  scaleControls.setAttribute('aria-label', 'Размер выбранных работ');
+  const shrink = makeButton('', 'Уменьшить выбранное', '−');
+  const grow = makeButton('', 'Увеличить выбранное', '+');
   scaleControls.append(shrink, grow);
+  const selectionCount = document.createElement('span');
+  selectionCount.setAttribute('aria-live', 'polite');
   const undo = makeButton('', 'Отменить последнее изменение', 'Отменить');
   const publish = makeButton('editor-publish', 'Опубликовать раскладку', 'Опубликовать');
   const status = document.createElement('output');
   status.setAttribute('role', 'status');
-  status.textContent = 'Выбери работу кликом';
-  toolbar.append(jump, scaleControls, moveHere, undo, status, publish);
+  status.textContent = 'Удерживай ⇧ или ⌘ для выбора нескольких';
+  toolbar.append(jump, scaleControls, moveHere, undo, selectionCount, status, publish);
   document.body.prepend(toolbar);
   new ResizeObserver(() => {
     document.body.style.setProperty('--editor-toolbar-height', `${toolbar.offsetHeight}px`);
   }).observe(toolbar);
 
   const byId = new Map(works.map((work) => [work.id, work]));
+  const grabButtons = new Map();
   const history = [];
   const baseline = completePositions(saved);
   const draft = readDraft();
   const positions = draft ? completePositions(draft) : baseline;
-  let selected;
+  let selected = new Set();
   let drag;
   let scrollFrame;
   let busy = false;
   let published = JSON.stringify(baseline);
 
-  function select(work) {
-    selected?.figure.classList.remove('editor-selected');
-    selected = work;
-    selected?.figure.classList.add('editor-selected');
-    jump.value = selected?.id ?? '';
-    moveHere.disabled = !selected;
-    shrink.disabled = !selected || positions[selected.id][2] <= 60;
-    grow.disabled = !selected || positions[selected.id][2] >= canvasWidth;
+  function snapshot() {
+    return Array.from(selected, (id) => [id, [...positions[id]]]);
+  }
+
+  function bounds(entries) {
+    let left = Infinity, top = Infinity, right = 0, bottom = 0, maxY = 0;
+    for (const [id, [x, y, width]] of entries) {
+      left = Math.min(left, x);
+      top = Math.min(top, y);
+      right = Math.max(right, x + width);
+      bottom = Math.max(bottom, y + width * byId.get(id).ratio);
+      maxY = Math.max(maxY, y);
+    }
+    return { left, top, right, bottom, maxY };
+  }
+
+  function scaleLimits(entries, frame) {
+    const min = Math.max(...entries.map(([, [, , width]]) => 60 / width));
+    const maxX = canvasWidth / (frame.right - frame.left);
+    const maxY = frame.maxY > frame.top ? (limitY - frame.top) / (frame.maxY - frame.top) : Infinity;
+    return [min, Math.min(maxX, maxY)];
+  }
+
+  function updateScaleButtons() {
+    if (!selected.size) {
+      shrink.disabled = grow.disabled = true;
+      return;
+    }
+    const entries = snapshot();
+    const [min, max] = scaleLimits(entries, bounds(entries));
+    shrink.disabled = min >= 1;
+    grow.disabled = max <= 1;
+  }
+
+  function select(ids) {
+    const next = new Set(ids);
+    for (const id of new Set([...selected, ...next])) {
+      const active = next.has(id);
+      const { figure } = byId.get(id);
+      figure.classList.toggle('editor-selected', active);
+      figure.classList.toggle('editor-selected-single', active && next.size === 1);
+      grabButtons.get(id).setAttribute('aria-pressed', String(active));
+    }
+    selected = next;
+    jump.value = selected.size === 1 ? selected.values().next().value : '';
+    moveHere.disabled = !selected.size;
+    selectionCount.hidden = selected.size < 2;
+    selectionCount.textContent = `Выбрано ${selected.size}`;
+    updateScaleButtons();
+  }
+
+  function toggleSelection(id) {
+    select(selected.has(id) ? [...selected].filter((workId) => workId !== id) : [...selected, id]);
   }
 
   function update() {
     setPositions(positions);
     undo.disabled = !history.length;
     publish.disabled = busy || JSON.stringify(positions) === published;
-    shrink.disabled = !selected || positions[selected.id][2] <= 60;
-    grow.disabled = !selected || positions[selected.id][2] >= canvasWidth;
+    updateScaleButtons();
   }
 
   function persist() {
     saveDraft(JSON.stringify(positions) === published ? null : positions);
   }
 
-  function record(id, original) {
-    if (positions[id].every((value, index) => value === original[index])) return;
-    history.push({ id, original });
+  function record(original) {
+    if (original.every(([id, old]) => positions[id].every((value, index) => value === old[index]))) return;
+    history.push(original);
     persist();
     status.textContent = 'Черновик сохранён в этом браузере';
     update();
   }
 
   function scaleSelected(factor) {
-    const { id } = selected;
-    const [x, y, width] = positions[id];
-    const nextWidth = clamp(width * factor, 60, canvasWidth);
-    const nextX = clamp(x + (width - nextWidth) / 2, 0, canvasWidth - nextWidth);
-    positions[id] = [nextX, y, nextWidth];
-    record(id, [x, y, width]);
+    const original = snapshot();
+    const frame = bounds(original);
+    const [min, max] = scaleLimits(original, frame);
+    const scale = Math.min(max, Math.max(min, factor));
+    const width = frame.right - frame.left;
+    const left = clamp(frame.left + (width - width * scale) / 2, 0, canvasWidth - Math.round(width * scale));
+    for (const [id, [x, y, workWidth]] of original) {
+      const nextWidth = clamp(workWidth * scale, 60, canvasWidth);
+      const nextX = clamp(left + (x - frame.left) * scale, 0, canvasWidth - nextWidth);
+      const nextY = clamp(frame.top + (y - frame.top) * scale, 0, limitY);
+      positions[id] = [nextX, nextY, nextWidth];
+    }
+    record(original);
   }
 
   shrink.addEventListener('click', () => scaleSelected(1 / 1.12));
@@ -116,14 +170,28 @@ export function initializeEditor({ works, canvasWidth, canvasMetrics, completePo
     return [(event.clientX - rect.left - left) / scale, (event.clientY - rect.top - top) / scale];
   }
 
+  function translate(original, frame, dx, dy) {
+    const offsetX = clamp(dx, -frame.left, canvasWidth - frame.right);
+    const offsetY = clamp(dy, -frame.top, limitY - frame.maxY);
+    for (const [id, [x, y, width]] of original) {
+      positions[id] = [x + offsetX, y + offsetY, width];
+    }
+  }
+
+  function resizeOne(original, dx) {
+    const [[id, [x, y, width]]] = original;
+    positions[id] = [x, y, clamp(width + dx, 60, canvasWidth - x)];
+  }
+
   function positionDrag(event) {
-    const [x, y, width] = drag.original;
     const [cursorX, cursorY] = coordinates(event);
     const dx = cursorX - drag.startX;
     const dy = cursorY - drag.startY;
-    positions[drag.work.id] = drag.resize
-      ? [x, y, clamp(width + dx, 60, canvasWidth - x)]
-      : [clamp(x + dx, 0, canvasWidth - width), clamp(y + dy, 0, limitY), width];
+    if (drag.resize) {
+      resizeOne(drag.original, dx);
+    } else {
+      translate(drag.original, drag.frame, dx, dy);
+    }
     setPositions(positions);
   }
 
@@ -142,30 +210,49 @@ export function initializeEditor({ works, canvasWidth, canvasMetrics, completePo
 
   function startDrag(event, work, resize) {
     if (event.button !== 0 || drag) return;
-    select(work);
+    if (!resize && (event.shiftKey || event.metaKey)) {
+      event.preventDefault();
+      toggleSelection(work.id);
+      return;
+    }
+    if (!selected.has(work.id)) select([work.id]);
     const [startX, startY] = coordinates(event);
-    drag = { work, pointerId: event.pointerId, event, startX, startY, resize, original: [...positions[work.id]] };
+    const original = snapshot();
+    drag = { work, pointerId: event.pointerId, event, startX, startY, resize, original, frame: bounds(original), moving: false };
     event.currentTarget.setPointerCapture(event.pointerId);
-    scrollFrame = requestAnimationFrame(autoScroll);
   }
 
   function endDrag(event) {
     if (drag?.pointerId !== event.pointerId) return;
     cancelAnimationFrame(scrollFrame);
-    const { work, original } = drag;
+    const { work, original, moving, resize } = drag;
     drag = null;
-    record(work.id, original);
+    if (moving) {
+      record(original);
+    } else if (!resize && event.type === 'pointerup') {
+      select([work.id]);
+    }
   }
 
   for (const work of works) {
     const grab = makeButton('editor-grab', `Переместить: ${work.title}`);
     const resize = makeButton('editor-resize', `Изменить ширину: ${work.title}`);
-    grab.addEventListener('click', () => select(work));
+    grab.setAttribute('aria-pressed', 'false');
+    grabButtons.set(work.id, grab);
+    grab.addEventListener('click', (event) => {
+      if (event.detail !== 0) return;
+      if (event.shiftKey || event.metaKey) toggleSelection(work.id);
+      else select([work.id]);
+    });
     for (const handle of [grab, resize]) {
-      handle.addEventListener('focus', () => select(work));
       handle.addEventListener('pointerdown', (event) => startDrag(event, work, handle === resize));
       handle.addEventListener('pointermove', (event) => {
         if (drag?.pointerId !== event.pointerId) return;
+        if (!drag.moving) {
+          if (Math.hypot(event.clientX - drag.event.clientX, event.clientY - drag.event.clientY) < 3) return;
+          drag.moving = true;
+          scrollFrame = requestAnimationFrame(autoScroll);
+        }
         drag.event = event;
         positionDrag(event);
       });
@@ -174,16 +261,15 @@ export function initializeEditor({ works, canvasWidth, canvasMetrics, completePo
       }
       handle.addEventListener('keydown', (event) => {
         if (!event.key.startsWith('Arrow')) return;
-        const [x, y, width] = positions[work.id];
+        if (!selected.has(work.id)) select([work.id]);
         const step = event.shiftKey ? 24 : 4;
         const dx = step * ((event.key === 'ArrowRight') - (event.key === 'ArrowLeft'));
         const dy = step * ((event.key === 'ArrowDown') - (event.key === 'ArrowUp'));
-        const original = [x, y, width];
-        positions[work.id] = handle === resize
-          ? [x, y, clamp(width + dx + dy, 60, canvasWidth - x)]
-          : [clamp(x + dx, 0, canvasWidth - width), clamp(y + dy, 0, limitY), width];
+        const original = snapshot();
+        if (handle === resize) resizeOne(original, dx + dy);
+        else translate(original, bounds(original), dx, dy);
         event.preventDefault();
-        record(work.id, original);
+        record(original);
       });
     }
     work.figure.append(grab, resize);
@@ -191,25 +277,27 @@ export function initializeEditor({ works, canvasWidth, canvasMetrics, completePo
   }
 
   jump.addEventListener('change', () => {
-    select(byId.get(jump.value));
-    selected?.figure.scrollIntoView({ block: 'center' });
+    const work = byId.get(jump.value);
+    select(work ? [work.id] : []);
+    work?.figure.scrollIntoView({ block: 'center' });
+  });
+  gallery.addEventListener('click', (event) => {
+    if (event.target === gallery) select([]);
   });
   moveHere.addEventListener('click', () => {
-    const { id, ratio } = selected;
-    const original = [...positions[id]];
+    const original = snapshot();
+    const frame = bounds(original);
     const { scale, top, rect } = canvasMetrics();
-    const y = (innerHeight / 2 - rect.top - top) / scale - original[2] * ratio / 2;
-    positions[id][1] = clamp(y, 0, limitY);
-    record(id, original);
-    selected.figure.scrollIntoView({ block: 'center' });
+    const offsetY = (innerHeight / 2 - rect.top - top) / scale - (frame.top + frame.bottom) / 2;
+    translate(original, frame, 0, offsetY);
+    record(original);
   });
   undo.addEventListener('click', () => {
-    const { id, original } = history.pop();
-    positions[id] = original;
+    const original = history.pop();
+    for (const [id, position] of original) positions[id] = position;
     persist();
-    select(byId.get(id));
+    select(original.map(([id]) => id));
     update();
-    selected.figure.scrollIntoView({ block: 'center' });
     status.textContent = 'Последнее изменение отменено';
   });
 
@@ -237,6 +325,6 @@ export function initializeEditor({ works, canvasWidth, canvasMetrics, completePo
     }
   });
 
-  select();
+  select([]);
   update();
 }
