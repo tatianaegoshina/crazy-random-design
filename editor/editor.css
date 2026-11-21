@@ -59,6 +59,10 @@ body {
   opacity: 0.48;
 }
 
+.editor-toolbar .editor-delete {
+  color: #9d2626;
+}
+
 .editor-toolbar .editor-publish {
   margin-left: auto;
   border-color: #222;

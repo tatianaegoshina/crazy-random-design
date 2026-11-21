@@ -114,7 +114,7 @@ function render() {
     } else {
       clearRotation(figure);
     }
-    edge = Math.max(edge, y + height);
+    if (!figure.hidden) edge = Math.max(edge, y + height);
   }
   const editingRoom = editorToken ? 480 : 0;
   gallery.style.minHeight = `${top + (edge + editingRoom) * scale + bottom}px`;
@@ -126,14 +126,21 @@ function setPositions(next) {
   render();
 }
 
+function setHidden(hidden) {
+  for (const { id, figure } of works) figure.hidden = hidden.has(id);
+}
+
 async function readLayout() {
   try {
     const response = await fetch(new URL('desktop-layout.json', import.meta.url), { cache: 'no-cache' });
-    if (response.ok) return (await response.json()).positions ?? {};
+    if (response.ok) {
+      const saved = await response.json();
+      return { positions: saved.positions ?? {}, hidden: Array.isArray(saved.hidden) ? saved.hidden : [] };
+    }
   } catch {
     // The ordinary column is usable while the layout file is unavailable.
   }
-  return {};
+  return { positions: {}, hidden: [] };
 }
 
 const videoObserver = new IntersectionObserver((entries) => {
@@ -159,12 +166,15 @@ new ResizeObserver(() => {
 const saved = await readLayout();
 if (editorToken) {
   const { initializeEditor } = await import('./editor/editor.js');
-  initializeEditor({ gallery, works, canvasWidth, canvasMetrics, completePositions, setPositions, orientedRatio, saved, editorToken });
-} else if (works.some(({ id }) => isPosition(saved[id]))) {
-  function applyDesktopLayout() {
-    if (desktop.matches && !Object.keys(positions).length) positions = completePositions(saved);
-    render();
+  initializeEditor({ gallery, works, canvasWidth, canvasMetrics, completePositions, setPositions, setHidden, orientedRatio, saved, editorToken });
+} else {
+  setHidden(new Set(saved.hidden));
+  if (works.some(({ id }) => isPosition(saved.positions[id]))) {
+    function applyDesktopLayout() {
+      if (desktop.matches && !Object.keys(positions).length) positions = completePositions(saved.positions);
+      render();
+    }
+    applyDesktopLayout();
+    desktop.addEventListener('change', applyDesktopLayout);
   }
-  applyDesktopLayout();
-  desktop.addEventListener('change', applyDesktopLayout);
 }

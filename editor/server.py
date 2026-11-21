@@ -47,6 +47,14 @@ def validate_layout(payload):
     expected = WorkIDs((ROOT / "index.html").read_text(encoding="utf-8")).ids
     if not isinstance(positions, dict) or positions.keys() != expected:
         raise ValueError("Список работ изменился. Перезагрузи редактор и повтори публикацию.")
+    if "hidden" in payload:
+        hidden = payload["hidden"]
+    else:
+        published = json.loads(LAYOUT.read_text(encoding="utf-8"))
+        hidden = [id for id in published.get("hidden", []) if id in expected]
+    if (not isinstance(hidden, list) or any(type(id) is not str or id not in expected for id in hidden)
+            or len(hidden) != len(set(hidden))):
+        raise ValueError("В списке удалённых работ есть некорректные элементы.")
     for position in positions.values():
         if not isinstance(position, list) or len(position) not in (3, 4) or any(type(value) is not int for value in position):
             raise ValueError("В раскладке есть некорректные координаты.")
@@ -55,7 +63,7 @@ def validate_layout(payload):
             raise ValueError("В раскладке есть работы за пределами холста.")
         if orientation and orientation[0] not in (0, 90, 180, 270):
             raise ValueError("В раскладке есть некорректный угол поворота.")
-    return {"positions": positions}
+    return {"positions": positions, "hidden": hidden}
 
 
 def git(*args, check=True):

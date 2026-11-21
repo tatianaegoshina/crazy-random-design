@@ -13,16 +13,18 @@ function makeButton(className, label, text = '') {
 
 function readDraft() {
   try {
-    return JSON.parse(localStorage.getItem(storageKey)) ?? null;
+    const draft = JSON.parse(localStorage.getItem(storageKey));
+    if (!draft) return null;
+    return draft.positions ? draft : { positions: draft };
   } catch {
     return null;
   }
 }
 
-function saveDraft(positions) {
+function saveDraft(contents) {
   try {
-    if (positions) {
-      localStorage.setItem(storageKey, JSON.stringify(positions));
+    if (contents) {
+      localStorage.setItem(storageKey, contents);
     } else {
       localStorage.removeItem(storageKey);
     }
@@ -31,7 +33,11 @@ function saveDraft(positions) {
   }
 }
 
-export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, completePositions, setPositions, orientedRatio, saved, editorToken }) {
+function serialize(positions, hidden) {
+  return JSON.stringify({ positions, hidden: [...hidden].sort() });
+}
+
+export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, completePositions, setPositions, setHidden, orientedRatio, saved, editorToken }) {
   const toolbar = document.createElement('aside');
   toolbar.className = 'editor-toolbar';
   toolbar.setAttribute('aria-label', 'Редактор раскладки');
@@ -51,11 +57,12 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
   const selectionCount = document.createElement('span');
   selectionCount.setAttribute('aria-live', 'polite');
   const undo = makeButton('', 'Отменить последнее изменение', 'Отменить');
+  const remove = makeButton('editor-delete', 'Удалить выбранные работы из галереи', 'Удалить');
   const publish = makeButton('editor-publish', 'Опубликовать раскладку', 'Опубликовать');
   const status = document.createElement('output');
   status.setAttribute('role', 'status');
   status.textContent = 'Удерживай ⇧ или ⌘ для выбора нескольких';
-  toolbar.append(jump, scaleControls, rotate, moveHere, undo, selectionCount, status, publish);
+  toolbar.append(jump, scaleControls, rotate, moveHere, undo, remove, selectionCount, status, publish);
   document.body.prepend(toolbar);
   new ResizeObserver(() => {
     document.body.style.setProperty('--editor-toolbar-height', `${toolbar.offsetHeight}px`);
@@ -63,15 +70,22 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
 
   const byId = new Map(works.map((work) => [work.id, work]));
   const grabButtons = new Map();
+  const options = new Map();
   const history = [];
-  const baseline = completePositions(saved);
+  const baseline = completePositions(saved.positions);
+  const baselineHidden = new Set(saved.hidden.filter((id) => byId.has(id)));
   const draft = readDraft();
-  const positions = draft ? completePositions(draft) : baseline;
+  const positions = draft ? completePositions(draft.positions) : baseline;
+  const hidden = Array.isArray(draft?.hidden)
+    ? new Set(draft.hidden.filter((id) => byId.has(id)))
+    : new Set(baselineHidden);
+  const draftRemovals = [...hidden].filter((id) => !baselineHidden.has(id));
+  if (draftRemovals.length) history.push({ removed: draftRemovals });
   let selected = new Set();
   let drag;
   let scrollFrame;
   let busy = false;
-  let published = JSON.stringify(baseline);
+  let published = serialize(baseline, baselineHidden);
 
   function snapshot() {
     return Array.from(selected, (id) => [id, [...positions[id]]]);
@@ -119,6 +133,7 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
     selected = next;
     jump.value = selected.size === 1 ? selected.values().next().value : '';
     moveHere.disabled = !selected.size;
+    remove.disabled = !selected.size;
     rotate.disabled = selected.size !== 1;
     selectionCount.hidden = selected.size < 2;
     selectionCount.textContent = `Выбрано ${selected.size}`;
@@ -130,20 +145,23 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
   }
 
   function update() {
+    setHidden(hidden);
+    for (const [id, option] of options) option.hidden = option.disabled = hidden.has(id);
     setPositions(positions);
     undo.disabled = !history.length;
-    publish.disabled = busy || JSON.stringify(positions) === published;
+    publish.disabled = busy || serialize(positions, hidden) === published;
     updateScaleButtons();
   }
 
   function persist() {
-    saveDraft(JSON.stringify(positions) === published ? null : positions);
+    const contents = serialize(positions, hidden);
+    saveDraft(contents === published ? null : contents);
   }
 
   function record(original) {
     if (original.every(([id, old]) => positions[id].length === old.length
       && positions[id].every((value, index) => value === old[index]))) return;
-    history.push(original);
+    history.push({ positions: original });
     persist();
     status.textContent = 'Черновик сохранён в этом браузере';
     update();
@@ -289,7 +307,9 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
       });
     }
     work.figure.append(grab, resize);
-    jump.add(new Option(work.title, work.id));
+    const option = new Option(work.title, work.id);
+    options.set(work.id, option);
+    jump.add(option);
   }
 
   jump.addEventListener('change', () => {
@@ -308,17 +328,31 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
     translate(original, frame, 0, offsetY);
     record(original);
   });
-  undo.addEventListener('click', () => {
-    const original = history.pop();
-    for (const [id, position] of original) positions[id] = position;
+  remove.addEventListener('click', () => {
+    const removed = [...selected];
+    for (const id of removed) hidden.add(id);
+    history.push({ removed });
+    select([]);
     persist();
-    select(original.map(([id]) => id));
+    update();
+    status.textContent = 'Удалено из черновика';
+  });
+  undo.addEventListener('click', () => {
+    const change = history.pop();
+    if (change.removed) {
+      for (const id of change.removed) hidden.delete(id);
+      select(change.removed);
+    } else {
+      for (const [id, position] of change.positions) positions[id] = position;
+      select(change.positions.map(([id]) => id));
+    }
+    persist();
     update();
     status.textContent = 'Последнее изменение отменено';
   });
 
   publish.addEventListener('click', async () => {
-    const snapshot = JSON.stringify(positions);
+    const snapshot = serialize(positions, hidden);
     busy = true;
     status.textContent = 'Отправляю на GitHub…';
     update();
@@ -326,7 +360,7 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
       const response = await fetch('/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Editor-Token': editorToken },
-        body: `{"positions":${snapshot}}`,
+        body: snapshot,
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error);
