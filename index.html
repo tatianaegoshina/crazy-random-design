@@ -112,6 +112,19 @@
         block-size: auto;
         margin-inline: auto;
       }
+
+      .gallery--positioned {
+        display: block;
+        position: relative;
+      }
+
+      .gallery--positioned .work {
+        position: absolute;
+      }
+
+      .gallery--positioned :is(img, video) {
+        inline-size: 100%;
+      }
     </style>
   </head>
   <body>
@@ -275,24 +288,115 @@
       <figure class="work work--portrait">
         <img src="media/inst.webp" width="1796" height="2400" loading="lazy" decoding="async" alt="Fruit illustrations above colorful Tatiana lettering">
       </figure>
+      <figure class="work work--wide">
+        <video width="1280" height="720" poster="media/quick-time-h-264-poster.webp" muted playsinline loop preload="none" aria-label="A figure in black with a folded paper headpiece">
+          <source src="media/quick-time-h-264.mp4" type="video/mp4">
+          <a href="media/quick-time-h-264.mp4">A figure in black with a folded paper headpiece</a>
+        </video>
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/ccf29122016-3.webp" width="2400" height="1765" loading="lazy" decoding="async" alt="An open book with sparse Russian text on both pages">
+      </figure>
+      <figure class="work work--small">
+        <img src="media/gaga-2.gif" width="300" height="341" loading="lazy" decoding="async" alt="Animated collage combining a face, a sun and a cake">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/evaluate-bg-0024ff-hover-66ff00-cover.webp" width="1460" height="828" loading="lazy" decoding="async" alt="An illustrated collage with a cat, a carpet and a tray of foliage">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/1-gop-stop-cover.webp" width="2400" height="1274" loading="lazy" decoding="async" alt="A pattern of black pixel-art faces">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/merry-test-bg-picture-hover-ff003c-cover.webp" width="1460" height="828" loading="lazy" decoding="async" alt="Gold rings, doves and white roses against pink fireworks">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/02-gold.webp" width="1244" height="720" loading="lazy" decoding="async" alt="A sunset inside gold rings surrounded by white roses">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/03-worst.webp" width="1244" height="720" loading="lazy" decoding="async" alt="Gold rings with flames, white doves and red roses">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/scholarships-bg-00ff12-hover-ffffff-cover.webp" width="1460" height="828" loading="lazy" decoding="async" alt="Colorful official-looking stamps printed on a slab of bread">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/7.webp" width="2400" height="1695" loading="lazy" decoding="async" alt="Magazine spread with cardboard packaging and a Kyrie Irving feature">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/10.webp" width="2400" height="1695" loading="lazy" decoding="async" alt="Editorial spread pairing a room photograph with technical text">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/the-future-issue.webp" width="2400" height="885" loading="lazy" decoding="async" alt="A row of angular, irregular letterforms in five bright colors">
+      </figure>
+      <figure class="work work--portrait">
+        <img src="media/instagram-cxdjsgerere.webp" width="1440" height="1800" loading="lazy" decoding="async" alt="A hand with three fingertips painted fluorescent red">
+      </figure>
+      <figure class="work">
+        <video width="720" height="720" poster="media/instagram-cuzcy1xfmhe-poster.webp" muted playsinline loop preload="none" aria-label="A short graphic experiment from July 2021">
+          <source src="media/instagram-cuzcy1xfmhe.mp4" type="video/mp4">
+          <a href="media/instagram-cuzcy1xfmhe.mp4">A short graphic experiment from July 2021</a>
+        </video>
+      </figure>
+      <figure class="work">
+        <video width="720" height="720" poster="media/instagram-crjnhhtfew9-poster.webp" muted playsinline loop preload="none" aria-label="An animation study from July 2021">
+          <source src="media/instagram-crjnhhtfew9.mp4" type="video/mp4">
+          <a href="media/instagram-crjnhhtfew9.mp4">An animation study from July 2021</a>
+        </video>
+      </figure>
+      <figure class="work work--portrait">
+        <img src="media/instagram-cq-9-hgrh7z.webp" width="1406" height="1757" loading="lazy" decoding="async" alt="An experimental portrait with a face partly dissolved in white">
+      </figure>
+      <figure class="work">
+        <img src="media/instagram-ckeuryinqyu.webp" width="1440" height="989" loading="lazy" decoding="async" alt="A portrait with a colorful geometric earring">
+      </figure>
+      <figure class="work">
+        <img src="media/instagram-cgsfbzphfrf-1.webp" width="1200" height="1200" loading="lazy" decoding="async" alt="Geometric shapes in yellow, green, purple and red on white">
+      </figure>
+      <figure class="work work--portrait">
+        <img src="media/instagram-b6pwboahpm6.webp" width="1440" height="1440" loading="lazy" decoding="async" alt="A receipt with a pink lip print and the words Thank You Goodbye">
+      </figure>
+      <figure class="work">
+        <video width="640" height="640" poster="media/instagram-br-i27agsup-poster.webp" muted playsinline loop preload="none" aria-label="An animation study from December 2018">
+          <source src="media/instagram-br-i27agsup.mp4" type="video/mp4">
+          <a href="media/instagram-br-i27agsup.mp4">An animation study from December 2018</a>
+        </video>
+      </figure>
+      <figure class="work work--portrait">
+        <img src="media/instagram-brqwyread2v.webp" width="1080" height="1350" loading="lazy" decoding="async" alt="A pink velvet top with a circular red print in its back cutout">
+      </figure>
+      <figure class="work">
+        <video width="640" height="640" poster="media/instagram-bodzhl6hmch-poster.webp" muted playsinline loop preload="none" aria-label="A short motion study from September 2018">
+          <source src="media/instagram-bodzhl6hmch.mp4" type="video/mp4">
+          <a href="media/instagram-bodzhl6hmch.mp4">A short motion study from September 2018</a>
+        </video>
+      </figure>
+      <figure class="work">
+        <img src="media/instagram-blm8-9enrsz-1.webp" width="1080" height="809" loading="lazy" decoding="async" alt="Small photographic patches on cream fabric">
+      </figure>
+      <figure class="work">
+        <img src="media/instagram-blm8-9enrsz-2.webp" width="1080" height="815" loading="lazy" decoding="async" alt="A cream garment decorated with small photographic patches">
+      </figure>
+      <figure class="work">
+        <img src="media/instagram-bh-qce5hmy3.webp" width="1080" height="1080" loading="lazy" decoding="async" alt="A printed photograph of a yellow skateboard on white fabric">
+      </figure>
+      <figure class="work">
+        <img src="media/instagram-bh3bsalhm-l.webp" width="1080" height="1080" loading="lazy" decoding="async" alt="An open book with typography warped into waves">
+      </figure>
+      <figure class="work">
+        <img src="media/instagram-bx-icd0f7zb.webp" width="1080" height="1080" loading="lazy" decoding="async" alt="A red Family Rights poster with black gothic type">
+      </figure>
+      <figure class="work">
+        <img src="media/instagram-btdjwetfgnh-4.webp" width="597" height="597" loading="lazy" decoding="async" alt="A small street photograph held up against a city street">
+      </figure>
+      <figure class="work">
+        <video width="720" height="720" poster="media/instagram-bqgizo0af4p-poster.webp" muted playsinline loop preload="none" aria-label="A motion study from February 2017">
+          <source src="media/instagram-bqgizo0af4p.mp4" type="video/mp4">
+          <a href="media/instagram-bqgizo0af4p.mp4">A motion study from February 2017</a>
+        </video>
+      </figure>
     </main>
     <footer class="fixed-label page-footer">
       <a href="https://tatianae.com/">tatiana egoshina</a>
     </footer>
-    <script>
-      const videoObserver = new IntersectionObserver((entries) => {
-        for (const { target: video, isIntersecting } of entries) {
-          if (isIntersecting) {
-            video.play().catch(() => {});
-          } else {
-            video.pause();
-          }
-        }
-      });
-
-      document.querySelectorAll('.gallery video').forEach((video) => {
-        videoObserver.observe(video);
-      });
-    </script>
+    <script type="module" src="gallery.js"></script>
   </body>
 </html>
