@@ -116,8 +116,7 @@ function render() {
     }
     if (!figure.hidden) edge = Math.max(edge, y + height);
   }
-  const editingRoom = editorToken ? 480 : 0;
-  gallery.style.minHeight = `${top + (edge + editingRoom) * scale + bottom}px`;
+  gallery.style.minHeight = `calc(${top + edge * scale + bottom}px + var(--drop-space, 0px))`;
   gallery.classList.add('gallery--positioned');
 }
 

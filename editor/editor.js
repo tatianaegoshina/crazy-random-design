@@ -261,6 +261,7 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
     cancelAnimationFrame(scrollFrame);
     const { work, original, moving, resize } = drag;
     drag = null;
+    gallery.classList.remove('editor-dragging');
     if (moving) {
       record(original);
     } else if (!resize && event.type === 'pointerup') {
@@ -285,6 +286,7 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
         if (!drag.moving) {
           if (Math.hypot(event.clientX - drag.event.clientX, event.clientY - drag.event.clientY) < 3) return;
           drag.moving = true;
+          gallery.classList.add('editor-dragging');
           scrollFrame = requestAnimationFrame(autoScroll);
         }
         drag.event = event;

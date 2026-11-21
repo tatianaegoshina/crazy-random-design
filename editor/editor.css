@@ -81,6 +81,10 @@ body {
   row-gap: 115px;
 }
 
+.editor-dragging {
+  --drop-space: min(45vh, 30rem);
+}
+
 .editor-grab,
 .editor-resize {
   position: absolute;
