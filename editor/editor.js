@@ -31,7 +31,7 @@ function saveDraft(positions) {
   }
 }
 
-export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, completePositions, setPositions, saved, editorToken }) {
+export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, completePositions, setPositions, orientedRatio, saved, editorToken }) {
   const toolbar = document.createElement('aside');
   toolbar.className = 'editor-toolbar';
   toolbar.setAttribute('aria-label', 'Редактор раскладки');
@@ -46,6 +46,7 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
   scaleControls.setAttribute('aria-label', 'Размер выбранных работ');
   const shrink = makeButton('', 'Уменьшить выбранное', '−');
   const grow = makeButton('', 'Увеличить выбранное', '+');
+  const rotate = makeButton('', 'Повернуть на 90° по часовой стрелке', '↻ 90°');
   scaleControls.append(shrink, grow);
   const selectionCount = document.createElement('span');
   selectionCount.setAttribute('aria-live', 'polite');
@@ -54,7 +55,7 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
   const status = document.createElement('output');
   status.setAttribute('role', 'status');
   status.textContent = 'Удерживай ⇧ или ⌘ для выбора нескольких';
-  toolbar.append(jump, scaleControls, moveHere, undo, selectionCount, status, publish);
+  toolbar.append(jump, scaleControls, rotate, moveHere, undo, selectionCount, status, publish);
   document.body.prepend(toolbar);
   new ResizeObserver(() => {
     document.body.style.setProperty('--editor-toolbar-height', `${toolbar.offsetHeight}px`);
@@ -78,11 +79,11 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
 
   function bounds(entries) {
     let left = Infinity, top = Infinity, right = 0, bottom = 0, maxY = 0;
-    for (const [id, [x, y, width]] of entries) {
+    for (const [id, [x, y, width, rotation]] of entries) {
       left = Math.min(left, x);
       top = Math.min(top, y);
       right = Math.max(right, x + width);
-      bottom = Math.max(bottom, y + width * byId.get(id).ratio);
+      bottom = Math.max(bottom, y + width * orientedRatio(byId.get(id).ratio, rotation));
       maxY = Math.max(maxY, y);
     }
     return { left, top, right, bottom, maxY };
@@ -118,6 +119,7 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
     selected = next;
     jump.value = selected.size === 1 ? selected.values().next().value : '';
     moveHere.disabled = !selected.size;
+    rotate.disabled = selected.size !== 1;
     selectionCount.hidden = selected.size < 2;
     selectionCount.textContent = `Выбрано ${selected.size}`;
     updateScaleButtons();
@@ -139,7 +141,8 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
   }
 
   function record(original) {
-    if (original.every(([id, old]) => positions[id].every((value, index) => value === old[index]))) return;
+    if (original.every(([id, old]) => positions[id].length === old.length
+      && positions[id].every((value, index) => value === old[index]))) return;
     history.push(original);
     persist();
     status.textContent = 'Черновик сохранён в этом браузере';
@@ -153,17 +156,30 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
     const scale = Math.min(max, Math.max(min, factor));
     const width = frame.right - frame.left;
     const left = clamp(frame.left + (width - width * scale) / 2, 0, canvasWidth - Math.round(width * scale));
-    for (const [id, [x, y, workWidth]] of original) {
+    for (const [id, [x, y, workWidth, ...orientation]] of original) {
       const nextWidth = clamp(workWidth * scale, 60, canvasWidth);
       const nextX = clamp(left + (x - frame.left) * scale, 0, canvasWidth - nextWidth);
       const nextY = clamp(frame.top + (y - frame.top) * scale, 0, limitY);
-      positions[id] = [nextX, nextY, nextWidth];
+      positions[id] = [nextX, nextY, nextWidth, ...orientation];
     }
     record(original);
   }
 
   shrink.addEventListener('click', () => scaleSelected(1 / 1.12));
   grow.addEventListener('click', () => scaleSelected(1.12));
+  rotate.addEventListener('click', () => {
+    const original = snapshot();
+    const [[id, [x, y, width, rotation = 0]]] = original;
+    const { ratio } = byId.get(id);
+    const nextRotation = (rotation + 90) % 360;
+    const height = width * orientedRatio(ratio, rotation);
+    const nextWidth = clamp(height, 60, canvasWidth);
+    const nextHeight = nextWidth * orientedRatio(ratio, nextRotation);
+    const nextX = clamp(x + (width - nextWidth) / 2, 0, canvasWidth - nextWidth);
+    const nextY = clamp(y + (height - nextHeight) / 2, 0, limitY);
+    positions[id] = nextRotation ? [nextX, nextY, nextWidth, nextRotation] : [nextX, nextY, nextWidth];
+    record(original);
+  });
 
   function coordinates(event) {
     const { left, top, scale, rect } = canvasMetrics();
@@ -173,14 +189,14 @@ export function initializeEditor({ gallery, works, canvasWidth, canvasMetrics, c
   function translate(original, frame, dx, dy) {
     const offsetX = clamp(dx, -frame.left, canvasWidth - frame.right);
     const offsetY = clamp(dy, -frame.top, limitY - frame.maxY);
-    for (const [id, [x, y, width]] of original) {
-      positions[id] = [x + offsetX, y + offsetY, width];
+    for (const [id, [x, y, width, ...orientation]] of original) {
+      positions[id] = [x + offsetX, y + offsetY, width, ...orientation];
     }
   }
 
   function resizeOne(original, dx) {
-    const [[id, [x, y, width]]] = original;
-    positions[id] = [x, y, clamp(width + dx, 60, canvasWidth - x)];
+    const [[id, [x, y, width, ...orientation]]] = original;
+    positions[id] = [x, y, clamp(width + dx, 60, canvasWidth - x), ...orientation];
   }
 
   function positionDrag(event) {

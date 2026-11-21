@@ -42,11 +42,24 @@ function columnPositions() {
 }
 
 function isPosition(position) {
-  if (!Array.isArray(position) || position.length !== 3 || !position.every(Number.isInteger)) {
+  if (!Array.isArray(position) || ![3, 4].includes(position.length) || !position.every(Number.isInteger)) {
     return false;
   }
-  const [x, y, width] = position;
-  return x >= 0 && y >= 0 && y <= 200000 && width >= 60 && x + width <= canvasWidth;
+  const [x, y, width, rotation = 0] = position;
+  return x >= 0 && y >= 0 && y <= 200000 && width >= 60 && x + width <= canvasWidth
+    && [0, 90, 180, 270].includes(rotation);
+}
+
+function orientedRatio(ratio, rotation = 0) {
+  return rotation % 180 ? 1 / ratio : ratio;
+}
+
+function clearRotation(figure) {
+  if (!figure.hasAttribute('data-rotated')) return;
+  figure.removeAttribute('data-rotated');
+  for (const property of ['height', '--media-width', '--media-rotation']) {
+    figure.style.removeProperty(property);
+  }
 }
 
 let defaults;
@@ -61,7 +74,7 @@ function completePositions(saved) {
 
   let bottom = works.reduce((edge, { id, ratio }) => {
     const position = placed[id];
-    return position ? Math.max(edge, position[1] + position[2] * ratio) : edge;
+    return position ? Math.max(edge, position[1] + position[2] * orientedRatio(ratio, position[3])) : edge;
   }, 0);
   for (const { id, ratio } of works) {
     if (placed[id]) continue;
@@ -80,6 +93,7 @@ function render() {
     gallery.style.removeProperty('min-height');
     for (const { figure } of works) {
       ['left', 'top', 'width'].forEach((property) => figure.style.removeProperty(property));
+      clearRotation(figure);
     }
     return;
   }
@@ -87,11 +101,20 @@ function render() {
   const { left, top, bottom, scale } = canvasMetrics();
   let edge = 0;
   for (const { id, figure, ratio } of works) {
-    const [x, y, width] = positions[id];
+    const [x, y, width, rotation = 0] = positions[id];
+    const height = width * orientedRatio(ratio, rotation);
     figure.style.left = `${left + x * scale}px`;
     figure.style.top = `${top + y * scale}px`;
     figure.style.width = `${width * scale}px`;
-    edge = Math.max(edge, y + width * ratio);
+    if (rotation) {
+      figure.setAttribute('data-rotated', '');
+      figure.style.height = `${height * scale}px`;
+      figure.style.setProperty('--media-width', `${(rotation % 180 ? height : width) * scale}px`);
+      figure.style.setProperty('--media-rotation', `${rotation}deg`);
+    } else {
+      clearRotation(figure);
+    }
+    edge = Math.max(edge, y + height);
   }
   const editingRoom = editorToken ? 480 : 0;
   gallery.style.minHeight = `${top + (edge + editingRoom) * scale + bottom}px`;
@@ -136,7 +159,7 @@ new ResizeObserver(() => {
 const saved = await readLayout();
 if (editorToken) {
   const { initializeEditor } = await import('./editor/editor.js');
-  initializeEditor({ gallery, works, canvasWidth, canvasMetrics, completePositions, setPositions, saved, editorToken });
+  initializeEditor({ gallery, works, canvasWidth, canvasMetrics, completePositions, setPositions, orientedRatio, saved, editorToken });
 } else if (works.some(({ id }) => isPosition(saved[id]))) {
   function applyDesktopLayout() {
     if (desktop.matches && !Object.keys(positions).length) positions = completePositions(saved);

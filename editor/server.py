@@ -48,11 +48,13 @@ def validate_layout(payload):
     if not isinstance(positions, dict) or positions.keys() != expected:
         raise ValueError("Список работ изменился. Перезагрузи редактор и повтори публикацию.")
     for position in positions.values():
-        if not isinstance(position, list) or len(position) != 3 or any(type(value) is not int for value in position):
+        if not isinstance(position, list) or len(position) not in (3, 4) or any(type(value) is not int for value in position):
             raise ValueError("В раскладке есть некорректные координаты.")
-        x, y, width = position
+        x, y, width, *orientation = position
         if not (0 <= x and 0 <= y <= 200000 and 60 <= width and x + width <= 1000):
             raise ValueError("В раскладке есть работы за пределами холста.")
+        if orientation and orientation[0] not in (0, 90, 180, 270):
+            raise ValueError("В раскладке есть некорректный угол поворота.")
     return {"positions": positions}
 
 

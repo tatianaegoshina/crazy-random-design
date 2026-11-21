@@ -125,6 +125,14 @@
       .gallery--positioned :is(img, video) {
         inline-size: 100%;
       }
+
+      .gallery--positioned .work[data-rotated] > :is(img, video) {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        inline-size: var(--media-width);
+        transform: translate(-50%, -50%) rotate(var(--media-rotation));
+      }
     </style>
   </head>
   <body>
