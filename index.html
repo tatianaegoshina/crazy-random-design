@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>crazy random design</title>
+    <meta name="description" content="A selection of design work by Tatiana Egoshina.">
+    <link rel="icon" href="data:,">
+    <style>
+      :root {
+        --label-height: 3.5rem;
+        --gallery-gutter: clamp(1rem, 5vw, 5rem);
+        --safe-top: env(safe-area-inset-top, 0px);
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-inline: max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+        color: #707070;
+        background: #fff;
+        font: 100%/1.25 Helvetica, Arial, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      .fixed-label {
+        position: fixed;
+        z-index: 1;
+        inset-inline: 0;
+        display: grid;
+        place-items: center;
+        min-block-size: var(--label-height);
+        padding-inline: max(1rem, var(--safe-inline));
+        pointer-events: none;
+        text-align: center;
+      }
+
+      .page-header {
+        inset-block-start: 0;
+        min-block-size: calc(var(--label-height) + var(--safe-top));
+        padding-block-start: var(--safe-top);
+      }
+
+      .page-header h1 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 400;
+      }
+
+      .page-footer {
+        inset-block-end: 0;
+        min-block-size: calc(var(--label-height) + var(--safe-bottom));
+        padding-block-end: var(--safe-bottom);
+      }
+
+      .page-footer a {
+        display: inline-grid;
+        place-items: center;
+        min-block-size: 2.75rem;
+        color: inherit;
+        text-decoration: none;
+        text-underline-offset: 0.2em;
+        pointer-events: auto;
+      }
+
+      .page-footer a:hover,
+      .page-footer a:focus-visible {
+        text-decoration: underline;
+      }
+
+      .gallery {
+        display: grid;
+        gap: clamp(3rem, 9vw, 8rem);
+        max-inline-size: 90rem;
+        margin-inline: auto;
+        padding-inline: max(var(--gallery-gutter), var(--safe-inline));
+        padding-block-start: calc(var(--label-height) + var(--safe-top) + var(--gallery-gutter));
+        padding-block-end: calc(var(--label-height) + var(--safe-bottom) + var(--gallery-gutter));
+      }
+
+      .gallery figure {
+        margin: 0;
+      }
+
+      .work {
+        --work-width: 42rem;
+      }
+
+      .work--wide {
+        --work-width: 63rem;
+      }
+
+      .work--portrait {
+        --work-width: 34rem;
+      }
+
+      .work--small {
+        --work-width: 28rem;
+      }
+
+      .gallery > :first-child {
+        --work-width: min(63rem, max(28rem, calc((100svh - 12rem) * 1.52)));
+      }
+
+      .gallery img,
+      .gallery video {
+        display: block;
+        inline-size: min(100%, var(--work-width));
+        block-size: auto;
+        margin-inline: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="fixed-label page-header">
+      <h1 id="page-title">crazy random design</h1>
+    </header>
+    <main class="gallery" aria-labelledby="page-title">
+      <figure class="work work--wide">
+        <img src="media/frame-6.webp" width="2400" height="1572" fetchpriority="high" alt="Hey! Let’s meet, a poster with colorful irregular lettering">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/dribbble-2.webp" width="2400" height="1800" loading="lazy" decoding="async" alt="NK Studio identity with oversized orange, pink, gray and green lettering">
+      </figure>
+      <figure class="work">
+        <video width="1920" height="1920" poster="media/06-16-poster.webp" muted playsinline loop preload="none" aria-label="Experimental animation with overlapping outlined letterforms">
+          <source src="media/06-16.mp4" type="video/mp4">
+          <a href="media/06-16.mp4">Experimental animation with overlapping outlined letterforms</a>
+        </video>
+      </figure>
+      <figure class="work work--small">
+        <img src="media/frame-299.webp" width="2179" height="2400" loading="lazy" decoding="async" alt="An abstract stack of multicolored translucent rectangles">
+      </figure>
+      <figure class="work">
+        <img src="media/frame-17.webp" width="2000" height="2000" loading="lazy" decoding="async" alt="A loose arrangement of numbered discs in bright colors">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/group-16.webp" width="2400" height="937" loading="lazy" decoding="async" alt="Two illustrated faces with yellow and blue hair">
+      </figure>
+      <figure class="work work--small">
+        <img src="media/frame-2.webp" width="1600" height="1600" loading="lazy" decoding="async" alt="Blue illustrated face with closed eyes and yellow hair">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/group-1.webp" width="2400" height="1200" loading="lazy" decoding="async" alt="Modular forms built from colored blocks">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/frame-21.webp" width="2400" height="1368" loading="lazy" decoding="async" alt="Gawa, a magazine wordmark in black calligraphic lettering">
+      </figure>
+      <figure class="work work--small">
+        <img src="media/artboard-1-4x.webp" width="2048" height="2048" loading="lazy" decoding="async" alt="Black line drawing with Try Your Luck with Heather lettering">
+      </figure>
+      <figure class="work work--small">
+        <img src="media/artboard-1-copy-4x.webp" width="2049" height="2048" loading="lazy" decoding="async" alt="Black line drawing of a decorated sweater with BAE lettering">
+      </figure>
+      <figure class="work work--small">
+        <img src="media/artboard-5-4x.webp" width="2400" height="2400" loading="lazy" decoding="async" alt="Black line drawing of a face surrounded by Hey You Boy lettering">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/frame-28.webp" width="2400" height="1351" loading="lazy" decoding="async" alt="Blackletter alphabet and numeral specimens">
+      </figure>
+      <figure class="work work--small">
+        <img src="media/screenshot-2022-12-14-at-23-02-07.webp" width="1168" height="1164" loading="lazy" decoding="async" alt="White wavy letter A on black">
+      </figure>
+      <figure class="work work--small">
+        <img src="media/screenshot-2022-12-14-at-23-02-49.webp" width="1156" height="1160" loading="lazy" decoding="async" alt="White wavy letter C on black">
+      </figure>
+      <figure class="work work--small">
+        <img src="media/screenshot-2022-12-14-at-23-03-57.webp" width="1164" height="1162" loading="lazy" decoding="async" alt="White wavy lowercase letter e on black">
+      </figure>
+      <figure class="work work--small">
+        <img src="media/screenshot-2022-12-14-at-23-08-27.webp" width="1156" height="1156" loading="lazy" decoding="async" alt="White wavy letter O on black">
+      </figure>
+      <figure class="work">
+        <video width="1200" height="1200" poster="media/02-1-poster.webp" muted playsinline loop preload="none" aria-label="Typography Experiments 02, animation one">
+          <source src="media/02-1.mp4" type="video/mp4">
+          <a href="media/02-1.mp4">Typography Experiments 02, animation one</a>
+        </video>
+      </figure>
+      <figure class="work">
+        <video width="1200" height="1200" poster="media/02-2-poster.webp" muted playsinline loop preload="none" aria-label="Typography Experiments 02, animation two">
+          <source src="media/02-2.mp4" type="video/mp4">
+          <a href="media/02-2.mp4">Typography Experiments 02, animation two</a>
+        </video>
+      </figure>
+      <figure class="work">
+        <img src="media/abcdinamo-workshop.webp" width="2400" height="2400" loading="lazy" decoding="async" alt="Four pink typographic forms from the Dinamo workshop">
+      </figure>
+      <figure class="work">
+        <img src="media/frame-13.webp" width="2400" height="2400" loading="lazy" decoding="async" alt="Fabrica letterforms made from overlapping colored shapes">
+      </figure>
+      <figure class="work work--portrait">
+        <img src="media/group-33.webp" width="1696" height="2400" loading="lazy" decoding="async" alt="Fabrica lettering arranged in a grid of colorful tiles">
+      </figure>
+      <figure class="work work--portrait">
+        <img src="media/group-4.webp" width="1811" height="2400" loading="lazy" decoding="async" alt="A grid of pale photographic studies of small objects">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/01-5.webp" width="2400" height="1024" loading="lazy" decoding="async" alt="A panoramic silver-gray composition with fine linework">
+      </figure>
+      <figure class="work work--portrait">
+        <img src="media/img-8804.webp" width="1800" height="2400" loading="lazy" decoding="async" alt="A yellow painted face nestled among green plants">
+      </figure>
+      <figure class="work work--portrait">
+        <img src="media/frame-64.webp" width="1796" height="2400" loading="lazy" decoding="async" alt="Green foliage arranged in a circular pattern on white">
+      </figure>
+      <figure class="work">
+        <img src="media/img-9486.webp" width="2400" height="1800" loading="lazy" decoding="async" alt="A pale object on dark asphalt">
+      </figure>
+      <figure class="work work--portrait">
+        <img src="media/img-1279.webp" width="2298" height="2400" loading="lazy" decoding="async" alt="Building façade with an angular window above the entrance">
+      </figure>
+      <figure class="work">
+        <img src="media/tatego-photorealistic-image-of-japanese-architecture-white-cube-00a9b935-c554-4bb5-ad45-ce1b56d61a74-transformed.webp" width="2400" height="2400" loading="lazy" decoding="async" alt="Architectural image of a white cubic building">
+      </figure>
+      <figure class="work">
+        <img src="media/tatego-photorealistic-image-of-japanese-architecture-white-cube-bbad46c3-6627-467a-acea-9352119d8b05-transformed.webp" width="2400" height="2400" loading="lazy" decoding="async" alt="A white geometric house flanked by trees">
+      </figure>
+      <figure class="work">
+        <img src="media/tatego-photorealistic-image-of-japanese-architecture-white-cube-f7d23597-0c7b-4180-aade-164a924f9836-transformed.webp" width="2400" height="2400" loading="lazy" decoding="async" alt="A white minimalist house with parked cars at dusk">
+      </figure>
+      <figure class="work">
+        <img src="media/tatego-photorealistic-image-of-japanese-architecture-white-cube-f7d23597-0c7b-4180-aade-164a924f9836.webp" width="1024" height="1024" loading="lazy" decoding="async" alt="An alternate view of a white minimalist home with parked cars">
+      </figure>
+      <figure class="work">
+        <img src="media/tatego-five-parked-cars-white-minimalistic-house-muted-color-fu-984dab2b-12df-43e6-a13d-346de0ce388a.webp" width="1024" height="1024" loading="lazy" decoding="async" alt="A row of parked cars in front of two houses">
+      </figure>
+      <figure class="work work--wide">
+        <video width="1920" height="1080" poster="media/tutto-passa-tatiana-egoshina-short-poster.webp" muted playsinline loop preload="none" aria-label="Tutto passa, a short film with yellow titles">
+          <source src="media/tutto-passa-tatiana-egoshina-short.mp4" type="video/mp4">
+          <a href="media/tutto-passa-tatiana-egoshina-short.mp4">Tutto passa, a short film with yellow titles</a>
+        </video>
+      </figure>
+      <figure class="work">
+        <img src="media/screenshot-2023-07-15-at-00-17-45-copy.webp" width="1407" height="1407" loading="lazy" decoding="async" alt="A soft-focus study of overlapping animal shapes">
+      </figure>
+      <figure class="work">
+        <img src="media/screenshot-2023-07-15-at-00-17-45.webp" width="2400" height="2400" loading="lazy" decoding="async" alt="Four soft-focus studies of animal shapes">
+      </figure>
+      <figure class="work work--small">
+        <img src="media/group-2.webp" width="2020" height="2020" loading="lazy" decoding="async" alt="A gray triangle with repeated white letters">
+      </figure>
+      <figure class="work">
+        <img src="media/group-3.webp" width="2288" height="1430" loading="lazy" decoding="async" alt="A dark green diamond with a pattern of small yellow letters">
+      </figure>
+      <figure class="work work--portrait">
+        <img src="media/frame-4.webp" width="1714" height="2400" loading="lazy" decoding="async" alt="Tatiana typographic poster in black and white">
+      </figure>
+      <figure class="work">
+        <img src="media/group-21.webp" width="1451" height="1468" loading="lazy" decoding="async" alt="Ciao stamps in bright red, blue, pink and green">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/group-23.webp" width="2300" height="948" loading="lazy" decoding="async" alt="Two neon rectangles with colorful perforated borders">
+      </figure>
+      <figure class="work work--portrait">
+        <img src="media/group-5.webp" width="1200" height="2400" loading="lazy" decoding="async" alt="Treviso graphic with red and lime-green stamps">
+      </figure>
+      <figure class="work">
+        <img src="media/frame-8.webp" width="2352" height="2352" loading="lazy" decoding="async" alt="Overlapping rounded shapes in bright pink, blue, orange and green">
+      </figure>
+      <figure class="work work--wide">
+        <img src="media/untitled.webp" width="2320" height="1220" loading="lazy" decoding="async" alt="A row of colorful cutout fruit illustrations">
+      </figure>
+      <figure class="work work--portrait">
+        <img src="media/inst.webp" width="1796" height="2400" loading="lazy" decoding="async" alt="Fruit illustrations above colorful Tatiana lettering">
+      </figure>
+    </main>
+    <footer class="fixed-label page-footer">
+      <a href="https://tatianae.com/">tatiana egoshina</a>
+    </footer>
+    <script>
+      const videoObserver = new IntersectionObserver((entries) => {
+        for (const { target: video, isIntersecting } of entries) {
+          if (isIntersecting) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        }
+      });
+
+      document.querySelectorAll('.gallery video').forEach((video) => {
+        videoObserver.observe(video);
+      });
+    </script>
+  </body>
+</html>
