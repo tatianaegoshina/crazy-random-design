@@ -1,3 +1,435 @@
 {
-  "positions": {}
+  "positions": {
+    "media/frame-6.webp": [
+      0,
+      0,
+      1000
+    ],
+    "media/dribbble-2.webp": [
+      196,
+      1364,
+      804
+    ],
+    "media/06-16.mp4": [
+      0,
+      659,
+      692
+    ],
+    "media/frame-299.webp": [
+      153,
+      2686,
+      724
+    ],
+    "media/frame-17.webp": [
+      0,
+      1969,
+      755
+    ],
+    "media/group-16.webp": [
+      58,
+      3487,
+      593
+    ],
+    "media/frame-2.webp": [
+      654,
+      3428,
+      346
+    ],
+    "media/group-1.webp": [
+      0,
+      32007,
+      1000
+    ],
+    "media/frame-21.webp": [
+      0,
+      4398,
+      1000
+    ],
+    "media/artboard-1-4x.webp": [
+      3,
+      4976,
+      665
+    ],
+    "media/artboard-1-copy-4x.webp": [
+      703,
+      4976,
+      297
+    ],
+    "media/artboard-5-4x.webp": [
+      702,
+      5310,
+      298
+    ],
+    "media/screenshot-2026-11-21-at-19-07-57.webp": [
+      0,
+      5716,
+      1000
+    ],
+    "media/screenshot-2026-11-21-at-19-08-47.webp": [
+      0,
+      6142,
+      1000
+    ],
+    "media/screenshot-2026-11-21-at-19-09-22.webp": [
+      0,
+      6809,
+      1000
+    ],
+    "media/frame-28.webp": [
+      0,
+      7507,
+      1000
+    ],
+    "media/screenshot-2022-12-14-at-23-02-07.webp": [
+      0,
+      8021,
+      241
+    ],
+    "media/screenshot-2022-12-14-at-23-02-49.webp": [
+      744,
+      8019,
+      239
+    ],
+    "media/screenshot-2022-12-14-at-23-03-57.webp": [
+      496,
+      8019,
+      242
+    ],
+    "media/screenshot-2022-12-14-at-23-08-27.webp": [
+      249,
+      8022,
+      240
+    ],
+    "media/02-1.mp4": [
+      0,
+      8343,
+      711
+    ],
+    "media/02-2.mp4": [
+      752,
+      8345,
+      248
+    ],
+    "media/abcdinamo-workshop.webp": [
+      363,
+      9050,
+      637
+    ],
+    "media/frame-13.webp": [
+      0,
+      11015,
+      1000
+    ],
+    "media/group-33.webp": [
+      525,
+      10267,
+      475
+    ],
+    "media/group-4.webp": [
+      0,
+      10268,
+      506
+    ],
+    "media/01-5.webp": [
+      0,
+      12066,
+      1000
+    ],
+    "media/img-8804.webp": [
+      0,
+      12553,
+      484
+    ],
+    "media/frame-64.webp": [
+      498,
+      12543,
+      502
+    ],
+    "media/img-9486.webp": [
+      0,
+      9682,
+      410,
+      90
+    ],
+    "media/img-1279.webp": [
+      281,
+      15784,
+      472
+    ],
+    "media/tatego-photorealistic-image-of-japanese-architecture-white-cube-00a9b935-c554-4bb5-ad45-ce1b56d61a74-transformed.webp": [
+      91,
+      16337,
+      415
+    ],
+    "media/tatego-photorealistic-image-of-japanese-architecture-white-cube-bbad46c3-6627-467a-acea-9352119d8b05-transformed.webp": [
+      517,
+      16338,
+      415
+    ],
+    "media/tatego-photorealistic-image-of-japanese-architecture-white-cube-f7d23597-0c7b-4180-aade-164a924f9836-transformed.webp": [
+      91,
+      16762,
+      415
+    ],
+    "media/tatego-five-parked-cars-white-minimalistic-house-muted-color-fu-984dab2b-12df-43e6-a13d-346de0ce388a.webp": [
+      517,
+      16761,
+      415
+    ],
+    "media/tutto-passa-tatiana-egoshina-short.mp4": [
+      0,
+      13264,
+      1000
+    ],
+    "media/screenshot-2023-07-15-at-00-17-45-copy.webp": [
+      0,
+      13860,
+      521
+    ],
+    "media/screenshot-2023-07-15-at-00-17-45.webp": [
+      479,
+      13858,
+      521
+    ],
+    "media/group-2.webp": [
+      0,
+      14408,
+      389
+    ],
+    "media/group-3.webp": [
+      417,
+      14421,
+      583
+    ],
+    "media/frame-4.webp": [
+      254,
+      14887,
+      534
+    ],
+    "media/group-21.webp": [
+      0,
+      19587,
+      583
+    ],
+    "media/group-23.webp": [
+      0,
+      20201,
+      1000
+    ],
+    "media/group-5.webp": [
+      245,
+      18588,
+      472
+    ],
+    "media/frame-8.webp": [
+      0,
+      23046,
+      679
+    ],
+    "media/inst.webp": [
+      0,
+      23718,
+      1000
+    ],
+    "media/quick-time-h-264.mp4": [
+      0,
+      17239,
+      1000
+    ],
+    "media/ccf29122016-3.webp": [
+      0,
+      17819,
+      1000
+    ],
+    "media/gaga-2.gif": [
+      232,
+      20703,
+      557
+    ],
+    "media/evaluate-bg-0024ff-hover-66ff00-cover.webp": [
+      142,
+      21404,
+      709
+    ],
+    "media/1-gop-stop-cover.webp": [
+      0,
+      21887,
+      1000
+    ],
+    "media/02-gold.webp": [
+      0,
+      22488,
+      1000
+    ],
+    "media/scholarships-bg-00ff12-hover-ffffff-cover.webp": [
+      0,
+      25003,
+      1000
+    ],
+    "media/7.webp": [
+      0,
+      25579,
+      1000
+    ],
+    "media/10.webp": [
+      0,
+      26278,
+      1000
+    ],
+    "media/the-future-issue.webp": [
+      0,
+      27022,
+      1000
+    ],
+    "media/instagram-cxdjsgerere.webp": [
+      0,
+      27424,
+      472
+    ],
+    "media/instagram-cuzcy1xfmhe.mp4": [
+      417,
+      27812,
+      583
+    ],
+    "media/instagram-crjnhhtfew9.mp4": [
+      0,
+      28419,
+      583
+    ],
+    "media/instagram-cq-9-hgrh7z.webp": [
+      174,
+      29011,
+      701
+    ],
+    "media/instagram-ckeuryinqyu.webp": [
+      417,
+      31584,
+      583
+    ],
+    "media/instagram-cgsfbzphfrf-1.webp": [
+      356,
+      3796,
+      644
+    ],
+    "media/instagram-b6pwboahpm6.webp": [
+      224,
+      30476,
+      584
+    ],
+    "media/instagram-br-i27agsup.mp4": [
+      214,
+      29818,
+      583
+    ],
+    "media/instagram-brqwyread2v.webp": [
+      528,
+      33147,
+      472
+    ],
+    "media/instagram-bodzhl6hmch.mp4": [
+      0,
+      32549,
+      583
+    ],
+    "media/instagram-blm8-9enrsz-1.webp": [
+      208,
+      42921,
+      583
+    ],
+    "media/instagram-blm8-9enrsz-2.webp": [
+      0,
+      33773,
+      1000
+    ],
+    "media/instagram-bh-qce5hmy3.webp": [
+      417,
+      35575,
+      583
+    ],
+    "media/instagram-bh3bsalhm-l.webp": [
+      0,
+      34547,
+      1000
+    ],
+    "media/instagram-bx-icd0f7zb.webp": [
+      0,
+      37829,
+      754
+    ],
+    "media/instagram-btdjwetfgnh-4.webp": [
+      0,
+      38599,
+      1000
+    ],
+    "media/instagram-bqgizo0af4p.mp4": [
+      0,
+      38590,
+      1000
+    ],
+    "media/00.webp": [
+      0,
+      31124,
+      1000
+    ],
+    "media/00-1.webp": [
+      0,
+      36490,
+      1000
+    ],
+    "media/00-2.webp": [
+      155,
+      47629,
+      389
+    ],
+    "media/00-3.webp": [
+      0,
+      36267,
+      389
+    ],
+    "media/00-4.webp": [
+      516,
+      36247,
+      389
+    ],
+    "media/00-5.webp": [
+      574,
+      37087,
+      389
+    ],
+    "media/00-6.webp": [
+      0,
+      35866,
+      389
+    ],
+    "media/00-7.webp": [
+      43,
+      37472,
+      389
+    ],
+    "media/00-8.webp": [
+      60,
+      37210,
+      389
+    ],
+    "media/00-9.webp": [
+      576,
+      37551,
+      389
+    ],
+    "media/facebook-ads-attribution.webp": [
+      0,
+      39555,
+      1000
+    ],
+    "media/title.webp": [
+      0,
+      40136,
+      1000
+    ]
+  },
+  "hidden": [
+    "media/00-2.webp",
+    "media/instagram-blm8-9enrsz-1.webp",
+    "media/instagram-btdjwetfgnh-4.webp"
+  ]
 }
