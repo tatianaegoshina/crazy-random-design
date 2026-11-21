@@ -31,39 +31,43 @@ function saveDraft(positions) {
   }
 }
 
-export function initializeEditor({ gallery, works, desktop, canvasWidth, canvasMetrics, completePositions, setPositions, saved, editorToken }) {
+export function initializeEditor({ works, canvasWidth, canvasMetrics, completePositions, setPositions, saved, editorToken }) {
   const toolbar = document.createElement('aside');
   toolbar.className = 'editor-toolbar';
   toolbar.setAttribute('aria-label', 'Редактор раскладки');
-  toolbar.innerHTML = '<strong>Расстановка работ</strong>';
+  toolbar.innerHTML = '<strong>Десктопная раскладка</strong>';
   const jump = document.createElement('select');
   jump.setAttribute('aria-label', 'Перейти к работе');
   jump.add(new Option('Перейти к работе…', ''));
   const moveHere = makeButton('', 'Перенести выбранную работу в видимую область', 'Перенести сюда');
+  const scaleControls = document.createElement('div');
+  scaleControls.className = 'editor-scale';
+  scaleControls.setAttribute('role', 'group');
+  scaleControls.setAttribute('aria-label', 'Размер выбранной работы');
+  const shrink = makeButton('', 'Уменьшить выбранную работу', '−');
+  const grow = makeButton('', 'Увеличить выбранную работу', '+');
+  scaleControls.append(shrink, grow);
   const undo = makeButton('', 'Отменить последнее изменение', 'Отменить');
   const publish = makeButton('editor-publish', 'Опубликовать раскладку', 'Опубликовать');
   const status = document.createElement('output');
   status.setAttribute('role', 'status');
-  status.textContent = 'Перетащи работу или потяни за угол';
-  toolbar.append(jump, moveHere, undo, status, publish);
+  status.textContent = 'Выбери работу кликом';
+  toolbar.append(jump, scaleControls, moveHere, undo, status, publish);
   document.body.prepend(toolbar);
   new ResizeObserver(() => {
     document.body.style.setProperty('--editor-toolbar-height', `${toolbar.offsetHeight}px`);
   }).observe(toolbar);
 
-  const note = document.createElement('p');
-  note.className = 'editor-note';
-  note.textContent = 'Это мобильная колонка. Расширь окно, чтобы редактировать десктопную раскладку.';
-  gallery.before(note);
-
   const byId = new Map(works.map((work) => [work.id, work]));
   const history = [];
-  let positions;
+  const baseline = completePositions(saved);
+  const draft = readDraft();
+  const positions = draft ? completePositions(draft) : baseline;
   let selected;
   let drag;
   let scrollFrame;
   let busy = false;
-  let published = JSON.stringify(saved);
+  let published = JSON.stringify(baseline);
 
   function select(work) {
     selected?.figure.classList.remove('editor-selected');
@@ -71,12 +75,16 @@ export function initializeEditor({ gallery, works, desktop, canvasWidth, canvasM
     selected?.figure.classList.add('editor-selected');
     jump.value = selected?.id ?? '';
     moveHere.disabled = !selected;
+    shrink.disabled = !selected || positions[selected.id][2] <= 60;
+    grow.disabled = !selected || positions[selected.id][2] >= canvasWidth;
   }
 
   function update() {
-    setPositions(positions ?? {});
+    setPositions(positions);
     undo.disabled = !history.length;
-    publish.disabled = busy || !positions || JSON.stringify(positions) === published;
+    publish.disabled = busy || JSON.stringify(positions) === published;
+    shrink.disabled = !selected || positions[selected.id][2] <= 60;
+    grow.disabled = !selected || positions[selected.id][2] >= canvasWidth;
   }
 
   function persist() {
@@ -90,6 +98,18 @@ export function initializeEditor({ gallery, works, desktop, canvasWidth, canvasM
     status.textContent = 'Черновик сохранён в этом браузере';
     update();
   }
+
+  function scaleSelected(factor) {
+    const { id } = selected;
+    const [x, y, width] = positions[id];
+    const nextWidth = clamp(width * factor, 60, canvasWidth);
+    const nextX = clamp(x + (width - nextWidth) / 2, 0, canvasWidth - nextWidth);
+    positions[id] = [nextX, y, nextWidth];
+    record(id, [x, y, width]);
+  }
+
+  shrink.addEventListener('click', () => scaleSelected(1 / 1.12));
+  grow.addEventListener('click', () => scaleSelected(1.12));
 
   function coordinates(event) {
     const { left, top, scale, rect } = canvasMetrics();
@@ -121,7 +141,7 @@ export function initializeEditor({ gallery, works, desktop, canvasWidth, canvasM
   }
 
   function startDrag(event, work, resize) {
-    if (!desktop.matches || event.button !== 0 || drag) return;
+    if (event.button !== 0 || drag) return;
     select(work);
     const [startX, startY] = coordinates(event);
     drag = { work, pointerId: event.pointerId, event, startX, startY, resize, original: [...positions[work.id]] };
@@ -140,6 +160,7 @@ export function initializeEditor({ gallery, works, desktop, canvasWidth, canvasM
   for (const work of works) {
     const grab = makeButton('editor-grab', `Переместить: ${work.title}`);
     const resize = makeButton('editor-resize', `Изменить ширину: ${work.title}`);
+    grab.addEventListener('click', () => select(work));
     for (const handle of [grab, resize]) {
       handle.addEventListener('focus', () => select(work));
       handle.addEventListener('pointerdown', (event) => startDrag(event, work, handle === resize));
@@ -216,18 +237,6 @@ export function initializeEditor({ gallery, works, desktop, canvasWidth, canvasM
     }
   });
 
-  function applyMode() {
-    note.hidden = desktop.matches;
-    if (desktop.matches && !positions) {
-      const draft = readDraft();
-      const baseline = completePositions(saved);
-      published = JSON.stringify(baseline);
-      positions = draft ? completePositions(draft) : baseline;
-    }
-    update();
-  }
-
   select();
-  applyMode();
-  desktop.addEventListener('change', applyMode);
+  update();
 }

@@ -24,8 +24,10 @@ function canvasMetrics() {
 }
 
 function columnPositions() {
+  const measureDesktop = editorToken && !desktop.matches;
+  if (measureDesktop) gallery.classList.add('editor-measuring-column');
   const { left, top, scale, rect } = canvasMetrics();
-  return Object.fromEntries(works.map(({ id, media }) => {
+  const column = Object.fromEntries(works.map(({ id, media }) => {
     const box = media.getBoundingClientRect();
     const width = Math.min(canvasWidth, Math.round(box.width / scale));
     const x = Math.round((box.left - rect.left - left) / scale);
@@ -35,6 +37,8 @@ function columnPositions() {
       width,
     ]];
   }));
+  if (measureDesktop) gallery.classList.remove('editor-measuring-column');
+  return column;
 }
 
 function isPosition(position) {
@@ -70,7 +74,7 @@ function completePositions(saved) {
 }
 
 function render() {
-  if (!desktop.matches || !Object.keys(positions).length) {
+  if ((!desktop.matches && !editorToken) || !Object.keys(positions).length) {
     if (!gallery.classList.contains('gallery--positioned')) return;
     gallery.classList.remove('gallery--positioned');
     gallery.style.removeProperty('min-height');
@@ -132,7 +136,7 @@ new ResizeObserver(() => {
 const saved = await readLayout();
 if (editorToken) {
   const { initializeEditor } = await import('./editor/editor.js');
-  initializeEditor({ gallery, works, desktop, canvasWidth, canvasMetrics, completePositions, setPositions, saved, editorToken });
+  initializeEditor({ works, canvasWidth, canvasMetrics, completePositions, setPositions, saved, editorToken });
 } else if (works.some(({ id }) => isPosition(saved[id]))) {
   function applyDesktopLayout() {
     if (desktop.matches && !Object.keys(positions).length) positions = completePositions(saved);
